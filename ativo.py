@@ -19,4 +19,4 @@ while True:
     print(str(msg,  encoding='utf-8'))
 
 # encerra a conexao
-sock.close() 
+sock.close()
