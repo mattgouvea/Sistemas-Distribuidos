@@ -9,10 +9,10 @@ sock = socket.socket() # default: socket.AF_INET, socket.SOCK_STREAM
 # conecta-se com o par passivo
 sock.connect((HOST, PORTA)) 
 
-# envia uma mensagem para o par conectado
+# envia uma mensagem para o par conectado, com o nome do arquivo
 # a mensagem "q" encerra a troca de mensagens e termina o programa
 while True:
-    msg = input("Escreva a mensagem: ")
+    msg = input("Digite o nome do arquivo. Para encerrar tecle 'q': ")
     if str(msg) == "q": break
     sock.send(bytes(msg, 'utf-8'))
     msg = sock.recv(1024)
