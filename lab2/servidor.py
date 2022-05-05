@@ -54,11 +54,11 @@ while True:
 
     # certifica que o arquivo foi encontrado
     if palavras_contadas != NULL:
-        mais_mencionadas = acha_5_mais_mencionadas(palavras_contadas)
+        palavras_ordenadas = acha_5_mais_mencionadas(palavras_contadas)
 
         # transforma a lista em uma string separada por quebra de linhas
-        mais_mencionadas = '\n'.join(mais_mencionadas) 
-        novoSock.send(b"Palavras mais encontradas:\n" + mais_mencionadas.encode('utf8'))
+        palavras_ordenadas = '\n'.join(palavras_ordenadas) 
+        novoSock.send(b"Palavras mais encontradas:\n" + palavras_ordenadas.encode('utf8'))
 
     # fecha a conexão com o socket atual
     novoSock.close()

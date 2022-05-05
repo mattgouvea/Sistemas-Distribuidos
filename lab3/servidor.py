@@ -5,7 +5,7 @@ import sys
 import threading
 
 HOST = ''    # '' possibilita acessar qualquer endereco alcancavel da maquina local
-PORTA = 5001  # porta onde chegarao as mensagens para essa aplicacao
+PORTA = 5000  # porta onde chegarao as mensagens para essa aplicacao
 
 entradas = [sys.stdin]
 conexoes = {}
@@ -75,46 +75,47 @@ def aceitaConexao(sock):
 	return clisock, endr
 
 def atendeRequisicoes(clisock, endr):
-	'''Recebe o nome do arquivo em forma de mensagem e retorna para o cliente
-    as 5 palavras mais mencionadas no arvquivo.
+    '''Recebe o nome do arquivo a ser analisado, e retorna as 5 palavras mais encontradas, em ordem
 	Entrada: socket da conexao e endereco do cliente
-	Saida:'''
+	Saida: '''
 
-	while True:
-		#recebe o nome do arquivo do cliente
-		nome_arquivo = clisock.recv(1024) 
-		if not nome_arquivo: # dados vazios: cliente encerrou
-			print(str(endr) + '-> encerrou')
-			clisock.close() # encerra a conexao com o cliente
-			return
-        elif: 
+    while True:
+        nome_arquivo = clisock.recv(1024)
+        # se o cliente não enviou mensagem, é porque ele encerrou
+        if not nome_arquivo:
+            print(str(endr) + '-> encerrou')
+            clisock.close()
+            return
+        
+        # conta todas as palavras no arquivo, caso ele exista
+        palavras_contadas = conta_ocorrencias(nome_arquivo)
+        # se não existir arquivo com o nome dado, o cliente pode enviar outro nome
+        if palavras_contadas == None:
+            clisock.send(b"Arquivo nao encontrado\n") # avisa ao cliente e prossegue para a próxima requisição
+            continue 
+        palavras_ordenadas = acha_5_mais_mencionadas(palavras_contadas)
+        palavras_ordenadas = '\n'.join(palavras_ordenadas) # monta uma lista de palavras separadas por quebra de linha
+        clisock.send(b"Palavras mais encontradas:\n" + palavras_ordenadas.encode('utf8'))
 
-		print(str(endr) + ': ' + str(data, encoding='utf-8'))
-		clisock.send(data) # ecoa os dados para o cliente
 
 def main():
     sock = iniciaServidor()
+    clientes=[] # lista de clientes sendo atendidos
     while True:
         leitura, escrita, excecao = select.select(entradas, [], [])
         for pronto in leitura:
             if pronto == sock:
-                novoSock, endr = aceitaConexao(sock)
-                #msg = novoSock.recv(1024)
-                #nome_arquivo = str(msg, encoding='utf_8')
-                #palavras_contadas = conta_ocorrencias(nome_arquivo)
-                #palavras_ordenadas = acha_5_mais_mencionadas(palavras_contadas)
-
-                # transforma a lista em uma string separada por quebra de linhas
-                #palavras_ordenadas = '\n'.join(palavras_ordenadas) 
-                #novoSock.send(b"Palavras mais encontradas:\n" + palavras_ordenadas.encode('utf8'))
+                novoSock, endr = aceitaConexao(sock) #conecta com um cliente
+                print("Conectado com: ", endr)
+                cliente = threading.Thread(target=atendeRequisicoes, args=(novoSock,endr))
+                cliente.start()
+                clientes.append(cliente)
             elif pronto == sys.stdin:
                 arg = input()
-                if arg == "fim":
+                if arg == 'fim': #solicitacao de finalizacao do servidor
+                    for c in clientes: #aguarda todas as threads terminarem
+                        c.join()
                     sock.close()
-                    exit()
+                    sys.exit()
 
-        
-        
-
-    # fecha o socket principal
-    # sock.close()
+main()

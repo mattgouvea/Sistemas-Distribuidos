@@ -1,7 +1,7 @@
 import socket
 
 HOST = 'localhost'  # maquina onde esta o par passivo
-PORTA = 5001        # porta que o par passivo esta escutando
+PORTA = 5000        # porta que o par passivo esta escutando
 
 # cria socket
 sock = socket.socket() # default: socket.AF_INET, socket.SOCK_STREAM 

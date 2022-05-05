@@ -8,7 +8,7 @@ import threading
 
 # define a localizacao do servidor
 HOST = '' # vazio indica que podera receber requisicoes a partir de qq interface de rede da maquina
-PORT = 5000 # porta de acesso
+PORT = 10001 # porta de acesso
 
 #define a lista de I/O de interesse (jah inclui a entrada padrao)
 entradas = [sys.stdin]
